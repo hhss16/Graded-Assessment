@@ -40,12 +40,10 @@ class OrderView(generics.ListCreateAPIView):
             order_serializer = OrderSerializer(data=data)
             if(order_serializer.is_valid()):
                 order = order_serializer.save()
-                # order_id = order.id
 
 
                 items = Cart.objects.all().filter(user=self.request.user).all()
                 
-                # OrderItem = 
                 for item in items.values():
                     orderitem = OrderItem(
                         order=order,
@@ -56,11 +54,10 @@ class OrderView(generics.ListCreateAPIView):
                     orderitem.save()
 
                 # Cart.objects.all().filter(user=self.request.user).delete()
-                
+
                 result = order_serializer.data.copy()
                 result['total'] = total;
                 return Response(result)
-                # return Response(order.id)
 
         
         def get_total_price(self,user):

@@ -52,7 +52,6 @@ class OrderSerializer(serializers.ModelSerializer):
         allow_null = True
     )
 
-    # total = serializers.DecimalField(max_digits=6, decimal_places=2, allow_null=True)
     class Meta:
         model = Order
         fields = ['id','user','delivery_crew','status', 'date', 'total']
