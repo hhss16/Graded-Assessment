@@ -91,3 +91,23 @@ Login as admin and access the following endppoints to create categories and menu
 Add items to cart by visiting this endpoint, or sending POST request with token
 
 * http://127.0.0.1:8000/api/cart/menu-items
+
+## Order 
+
+Order can be made from this endpoint - from browser or by making a POST request with token using a REST API Client w
+
+* http://127.0.0.1:8000/api/orders
+
+
+## Managers 
+
+Admin can add manager using this endpoint by sending a POST request with a valid `username` and an Admin token. Sending a DELETE request will remove this `username` from the managers group
+
+* http://127.0.0.1:8000/api/groups/manager/users
+
+
+## Delivery Crew
+
+Admin can add delivery crew using this endpoint by sending a POST request with a valid `username` and an Admin token. Sending a DELETE request will remove this `username` from the delivery crew group
+
+* http://127.0.0.1:8000/api/groups/delivery-crew/users
