@@ -4,19 +4,22 @@ from decimal import Decimal
 
 from .models import Category, MenuItem, Cart, Order, OrderItem
 
+
 class CategorySerializer (serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id','title', 'slug']
-    
+        fields = ['id', 'title', 'slug']
+
 
 class MenuItemSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(
-        queryset = Category.objects.all()
+        queryset=Category.objects.all()
     )
+    # category = CategorySerializer(read_only=True)
     class Meta:
         model = MenuItem
-        fields = ['id','title','price','category', 'featured']
+        fields = ['id', 'title', 'price', 'category', 'featured']
+
 
 class CartSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
@@ -24,10 +27,9 @@ class CartSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
     menuitem = serializers.PrimaryKeyRelatedField(
-        queryset = MenuItem.objects.all()
+        queryset=MenuItem.objects.all()
     )
 
-    # price = serializers.DecimalField(max_digits=5, decimal_places=2)
 
     def validate(self, attrs):
         attrs['price'] = attrs['quantity'] * attrs['unit_price']
@@ -35,10 +37,24 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields =  ['user','menuitem','unit_price','quantity','price']
+        fields = ['user', 'menuitem', 'unit_price', 'quantity', 'price']
         extra_kwargs = {
-            'price':{'read_only':True}
+            'price': {'read_only': True}
         }
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    # order = serializers.PrimaryKeyRelatedField(
+    #     queryset=Order.objects.all(),
+    # )
+    # menuitem = serializers.PrimaryKeyRelatedField(
+    #     queryset=MenuItem.objects.all()
+    # )
+
+    class Meta:
+        model = OrderItem
+        fields = ['order', 'menuitem', 'quantity', 'price']
+
 
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
@@ -48,26 +64,12 @@ class OrderSerializer(serializers.ModelSerializer):
 
     delivery_crew = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
-        # required=False,
-        allow_null = True
+        allow_null=True
     )
 
     class Meta:
         model = Order
-        fields = ['id','user','delivery_crew','status', 'date', 'total']
-        extra_kwargs = {
-            'total':{'read_only':True,}
-        }
+        fields = ['id', 'user', 'delivery_crew',
+                  'status', 'date', 'total']
+        depth = 1
 
-
-class OrderItemSerializer(serializers.ModelSerializer):
-    order = serializers.PrimaryKeyRelatedField(
-        queryset=Order.objects.all(),
-    )
-    menuitem = serializers.PrimaryKeyRelatedField(
-        queryset = MenuItem.objects.all()
-    )
-
-    class Meta:
-        model = OrderItem
-        fields =  ['order','menuitem','quantity','price']
