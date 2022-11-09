@@ -26,9 +26,6 @@ class CartSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(),
         default=serializers.CurrentUserDefault()
     )
-    menuitem = serializers.PrimaryKeyRelatedField(
-        queryset=MenuItem.objects.all()
-    )
 
 
     def validate(self, attrs):
@@ -44,13 +41,6 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    # order = serializers.PrimaryKeyRelatedField(
-    #     queryset=Order.objects.all(),
-    # )
-    # menuitem = serializers.PrimaryKeyRelatedField(
-    #     queryset=MenuItem.objects.all()
-    # )
-
     class Meta:
         model = OrderItem
         fields = ['order', 'menuitem', 'quantity', 'price']
@@ -62,10 +52,6 @@ class OrderSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
 
-    delivery_crew = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        allow_null=True
-    )
 
     orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
 
@@ -73,7 +59,6 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'user', 'delivery_crew',
                   'status', 'date', 'total', 'orderitem']
-        depth = 1
 
 
 class UserSerilializer(serializers.ModelSerializer):

@@ -45,3 +45,22 @@ REST_FRAMEWORK = {
 
 All models are created in the `LittleLemonDRF/models.py` file
 
+If you want to turn off order item details in the `orders` endpoint, then remove the `related_name=order` from this model
+
+```python
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name='order')
+    menuitem = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    quantity = models.SmallIntegerField()
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    class Meta:
+        unique_together = ('order', 'menuitem')
+
+```
+
+## Serializers 
+
+All serializers are in the `LittleLemonDRF/serializers.py' file 
+
