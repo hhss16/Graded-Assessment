@@ -34,12 +34,14 @@ class OrderView(generics.ListCreateAPIView):
             if menuitem_count==0:
                  return Response({"message:":"no item in cart"})
 
-            order_serializer = OrderSerializer(data=request.data)
+            data = request.data.copy()
+            total = self.get_total_price(self.request.user)
+            data['total'] = total
+            order_serializer = OrderSerializer(data=data)
             if(order_serializer.is_valid()):
                 order = order_serializer.save()
                 # order_id = order.id
 
-                total = 0
 
                 items = Cart.objects.all().filter(user=self.request.user).all()
                 
@@ -51,14 +53,13 @@ class OrderView(generics.ListCreateAPIView):
                         price = item['price'],
                         quantity = item['quantity'],
                     )
-                    total += item['price']
                     orderitem.save()
+
                 # Cart.objects.all().filter(user=self.request.user).delete()
-                order = Order.objects.get(pk=order.id)
-                order.total = total
-                order_serializer.data.total = total
-                order.save()
-                return Response(order_serializer.data)
+                
+                result = order_serializer.data.copy()
+                result['total'] = total;
+                return Response(result)
                 # return Response(order.id)
 
         
