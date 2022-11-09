@@ -62,5 +62,15 @@ class OrderItem(models.Model):
 
 ## Serializers 
 
-All serializers are in the `LittleLemonDRF/serializers.py' file 
+All serializers are in the `LittleLemonDRF/serializers.py` file. The `UserSerializer` class was userd to display the users (Managers and Delivery crews)
 
+## Available URLs
+
+## Using / Running this project
+
+Follow these steps to run this project. 
+
+### Create a superuser and then log into Django admin panel and create the following groups
+
+* Manager
+* Delivery Crew
