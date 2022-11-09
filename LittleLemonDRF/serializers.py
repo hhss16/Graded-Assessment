@@ -67,10 +67,12 @@ class OrderSerializer(serializers.ModelSerializer):
         allow_null=True
     )
 
+    orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
+
     class Meta:
         model = Order
         fields = ['id', 'user', 'delivery_crew',
-                  'status', 'date', 'total']
+                  'status', 'date', 'total', 'orderitem']
         depth = 1
 
 

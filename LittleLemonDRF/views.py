@@ -4,7 +4,6 @@ from .models import Category, MenuItem, Cart, Order, OrderItem
 from .serializers import CategorySerializer, MenuItemSerializer, CartSerializer, OrderSerializer, UserSerilializer
 from rest_framework.response import Response
 
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from django.shortcuts import  get_object_or_404
 
@@ -64,11 +63,18 @@ class OrderView(generics.ListCreateAPIView):
                 )
                 orderitem.save()
 
-            # Cart.objects.all().filter(user=self.request.user).delete()
+            Cart.objects.all().filter(user=self.request.user).delete() #delete cart items
 
             result = order_serializer.data.copy()
             result['total'] = total
             return Response(result)
+    
+    def get_total_price(self, user):
+        total = 0
+        items = Cart.objects.all().filter(user=user).all()
+        for item in items.values():
+            total += item['price']
+        return total
 
 
 class SingleOrderView(generics.RetrieveUpdateAPIView):
@@ -82,23 +88,6 @@ class SingleOrderView(generics.RetrieveUpdateAPIView):
         else:
             return Response('Not Ok')
 
-
-@api_view(['POST', 'DELETE'])
-@permission_classes([IsAdminUser])
-def managers(request):
-    username = request.data['username']
-
-    if username:
-        user = get_object_or_404(User, username=request.data['username'])
-        managers = Group.objects.get(name="Manager")
-        if request.method == 'POST':
-            managers.user_set.add(user)
-            return Response({"message": "user added to the manager group"}, 200)
-        elif request.method == 'DELETE':
-            managers.user_set.remove(user)
-            return Response({"message": "user removed from the manager group"}, 200)
-
-    return Response({"message": "error"}, 400)
 
 
 class GroupViewSet(viewsets.ViewSet):
@@ -139,60 +128,3 @@ class DeliveryCrewViewSet(viewsets.ViewSet):
         managers.user_set.remove(user)
         return Response({"message": "user removed from the delivery crew group"}, 200)
 
-# @api_view(['GET', 'POST'])
-# def orders(request):
-#     if (request.method == 'GET'):
-#         orders = Order.objects.all()
-#         serialized_item = OrderSerializer(orders, many=True)
-#         return Response(serialized_item.data)
-
-#     if (request.method == 'POST'):
-#         menuitem_count = Cart.objects.all().filter(user=request.user).count()
-#         if menuitem_count == 0:
-#             return Response({"message:": "no item in cart"})
-
-#         data = request.data.copy()
-#         total = get_total_price(request.user)
-
-#         # return Response(total)
-#         data['total'] = total
-#         order_serializer = OrderSerializer(data=data)
-#         if (order_serializer.is_valid()):
-#             order = order_serializer.save()
-
-#             items = Cart.objects.all().filter(user=request.user).all()
-
-#             for item in items.values():
-#                 orderitem = OrderItem(
-#                     order=order,
-#                     menuitem_id=item['menuitem_id'],
-#                     price=item['price'],
-#                     quantity=item['quantity'],
-#                 )
-#                 orderitem.save()
-
-#             # Cart.objects.all().filter(user=self.request.user).delete()
-
-#             result = order_serializer.data.copy()
-#             result['total'] = total
-#             return Response(result)
-
-    
-
-
-# def get_total_price(user):
-#     total = 0
-#     items = Cart.objects.all().filter(user=user).all()
-#     for item in items.values():
-#         total += item['price']
-#     return total
-
-
-# @api_view(['GET','PATCH'])
-# def single_order(request, pk):
-#     if (request.method == 'GET'):
-#         order = get_object_or_404(Order,pk=pk)
-#         serialized_item = OrderSerializer(order)
-#         return Response(serialized_item.data)
-#     if (request.method == 'PUT'):
-#         return Response(pk)
