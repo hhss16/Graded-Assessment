@@ -11,5 +11,8 @@ urlpatterns = [
     # path('orders', views.orders),
     # path('orders/<int:pk>', views.single_order),
     path('groups/manager/users', views.GroupViewSet.as_view(
+        {'get': 'list', 'post': 'create', 'delete': 'destroy'})),
+
+    path('groups/delivery-crew/users', views.DeliveryCrewViewSet.as_view(
         {'get': 'list', 'post': 'create', 'delete': 'destroy'}))
 ]

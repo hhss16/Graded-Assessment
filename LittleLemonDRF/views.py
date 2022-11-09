@@ -120,6 +120,25 @@ class GroupViewSet(viewsets.ViewSet):
         managers.user_set.remove(user)
         return Response({"message": "user removed from the manager group"}, 200)
 
+class DeliveryCrewViewSet(viewsets.ViewSet):
+    permission_classes = [IsAdminUser]
+    def list(self, request):
+        users = User.objects.all().filter(groups__name='Delivery Crew')
+        items = UserSerilializer(users, many=True)
+        return Response(items.data)
+
+    def create(self, request):
+        user = get_object_or_404(User, username=request.data['username'])
+        managers = Group.objects.get(name="Delivery Crew")
+        managers.user_set.add(user)
+        return Response({"message": "user added to the delivery crew group"}, 200)
+
+    def destroy(self, request):
+        user = get_object_or_404(User, username=request.data['username'])
+        managers = Group.objects.get(name="Delivery Crew")
+        managers.user_set.remove(user)
+        return Response({"message": "user removed from the delivery crew group"}, 200)
+
 # @api_view(['GET', 'POST'])
 # def orders(request):
 #     if (request.method == 'GET'):
