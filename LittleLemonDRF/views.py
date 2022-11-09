@@ -93,10 +93,13 @@ class SingleOrderView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
-        if request.user.groups.filter(name='Delivery Crew').exists() or request.user.groups.filter(name='Manager').exists():
-            return super().update(request, *args, **kwargs)
-        else:
+        #if request.user.groups.filter(name='Delivery Crew').exists() or request.user.groups.filter(name='Manager').exists():
+            # return super().update(request, *args, **kwargs)
+        
+        if self.request.user.groups.count()==0: # Normal user, not belonging to any group - Customer
             return Response('Not Ok')
+        else: #everyone else - Super Admin, Manager and Delivery Crew
+            return super().update(request, *args, **kwargs)
 
 
 

@@ -70,7 +70,14 @@ All serializers are in the `LittleLemonDRF/serializers.py` file. The `UserSerial
 
 Follow these steps to run this project. 
 
-### Create a superuser and then log into Django admin panel and create the following groups
+### Groups 
+Create a superuser and then log into Django admin panel and create the following groups
 
 * Manager
 * Delivery Crew
+
+### Users
+create a few random users and assign them randomly in these two groups 
+
+
+## Create menu items and 
