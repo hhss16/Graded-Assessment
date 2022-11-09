@@ -73,3 +73,8 @@ class OrderSerializer(serializers.ModelSerializer):
                   'status', 'date', 'total']
         depth = 1
 
+
+class UserSerilializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','username','email']
