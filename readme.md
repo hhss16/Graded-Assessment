@@ -111,3 +111,14 @@ Admin can add manager using this endpoint by sending a POST request with a valid
 Admin can add delivery crew using this endpoint by sending a POST request with a valid `username` and an Admin token. Sending a DELETE request will remove this `username` from the delivery crew group
 
 * http://127.0.0.1:8000/api/groups/delivery-crew/users
+
+
+## Valid Endpoints
+ * http://127.0.0.1:8000/api/categories
+ * http://127.0.0.1:8000/api/menu-items
+* http://127.0.0.1:8000/api/cart/menu-items
+* http://127.0.0.1:8000/api/groups/manager/users
+* http://127.0.0.1:8000/api/groups/delivery-crew/users
+* http://127.0.0.1:8000/auth/users/
+* http://127.0.0.1:8000/auth/users/me
+* http://127.0.0.1:8000/auth/token/login
