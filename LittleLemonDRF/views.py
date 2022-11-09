@@ -30,11 +30,44 @@ class OrderView(generics.ListCreateAPIView):
         permission_classes = [IsAuthenticated]
 
         def create(self, request, *args, **kwargs):
-            serializer = OrderSerializer(data=request.data)
-            if(serializer.is_valid()):
-                order = serializer.save()
-                return Response(order.id)
+            menuitem_count = Cart.objects.all().filter(user=self.request.user).count()
+            if menuitem_count==0:
+                 return Response({"message:":"no item in cart"})
+
+            order_serializer = OrderSerializer(data=request.data)
+            if(order_serializer.is_valid()):
+                order = order_serializer.save()
+                # order_id = order.id
+
+                total = 0
+
+                items = Cart.objects.all().filter(user=self.request.user).all()
+                
+                # OrderItem = 
+                for item in items.values():
+                    orderitem = OrderItem(
+                        order=order,
+                        menuitem_id = item['menuitem_id'],
+                        price = item['price'],
+                        quantity = item['quantity'],
+                    )
+                    total += item['price']
+                    orderitem.save()
+                # Cart.objects.all().filter(user=self.request.user).delete()
+                order = Order.objects.get(pk=order.id)
+                order.total = total
+                order_serializer.data.total = total
+                order.save()
+                return Response(order_serializer.data)
+                # return Response(order.id)
 
         
+        def get_total_price(self,user):
+            total = 0
+            items = Cart.objects.all().filter(user=user).all()
+            for item in items.values():
+                total += item['price']
+            return total
+
 
     

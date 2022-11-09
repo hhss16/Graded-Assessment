@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 from django.contrib.auth.models import User
 from decimal import Decimal
 
@@ -36,7 +35,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields =  ['user','menuitem','quantity','unit_price','price']
+        fields =  ['user','menuitem','unit_price','quantity','price']
         extra_kwargs = {
             'price':{'read_only':True}
         }
@@ -55,3 +54,19 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id','user','delivery_crew','status', 'date', 'total']
+        extra_kwargs = {
+            'total':{'read_only':True,}
+        }
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    order = serializers.PrimaryKeyRelatedField(
+        queryset=Order.objects.all(),
+    )
+    menuitem = serializers.PrimaryKeyRelatedField(
+        queryset = MenuItem.objects.all()
+    )
+
+    class Meta:
+        model = OrderItem
+        fields =  ['order','menuitem','quantity','price']
