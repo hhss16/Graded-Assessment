@@ -77,7 +77,12 @@ Create a superuser and then log into Django admin panel and create the following
 * Delivery Crew
 
 ### Users
-create a few random users and assign them randomly in these two groups 
+create a few random users and assign them randomly in these two groups> Also create token for each of these users from the admin panel for later use
 
 
-## Create menu items and 
+## Create categories and menu items 
+
+Login as admin and access the following endppoints to create categories and menu items. You can use both browsable API view or a RESt client with admin/manager token
+ * http://127.0.0.1:8000/api/categories
+ * http://127.0.0.1:8000/api/menu-items
+
