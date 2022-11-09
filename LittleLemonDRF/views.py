@@ -73,7 +73,7 @@ class OrderView(generics.ListCreateAPIView):
                 )
                 orderitem.save()
 
-            # Cart.objects.all().filter(user=self.request.user).delete() #delete cart items
+            Cart.objects.all().filter(user=self.request.user).delete() #delete cart items
 
             result = order_serializer.data.copy()
             result['total'] = total

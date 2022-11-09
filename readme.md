@@ -86,3 +86,8 @@ Login as admin and access the following endppoints to create categories and menu
  * http://127.0.0.1:8000/api/categories
  * http://127.0.0.1:8000/api/menu-items
 
+## Cart
+
+Add items to cart by visiting this endpoint, or sending POST request with token
+
+* http://127.0.0.1:8000/api/cart/menu-items
