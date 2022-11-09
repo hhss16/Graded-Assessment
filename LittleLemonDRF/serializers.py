@@ -8,6 +8,7 @@ class CategorySerializer (serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id','title', 'slug']
+    
 
 class MenuItemSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(
@@ -15,7 +16,7 @@ class MenuItemSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = MenuItem
-        fields = ['id','title','price','inventory','category']
+        fields = ['id','title','price','category', 'featured']
 
 class CartSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
@@ -25,6 +26,7 @@ class CartSerializer(serializers.ModelSerializer):
     menuitem = serializers.PrimaryKeyRelatedField(
         queryset = MenuItem.objects.all()
     )
+
     class Meta:
         model = Cart
         fields =  ['user','menuitem','quantity','unit_price','price']
