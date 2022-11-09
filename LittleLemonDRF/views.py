@@ -40,6 +40,16 @@ class OrderView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return Order.objects.all()
+        elif self.request.user.groups.count()==0: #normal customer - no group
+            return Order.objects.all().filter(user=self.request.user)
+        else: #delivery crew or manager
+            return Order.objects.all()
+        # else:
+        #     return Order.objects.all()
+
     def create(self, request, *args, **kwargs):
         menuitem_count = Cart.objects.all().filter(user=self.request.user).count()
         if menuitem_count == 0:
