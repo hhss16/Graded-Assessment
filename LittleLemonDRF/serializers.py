@@ -49,7 +49,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     delivery_crew = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
-        required=False,
+        # required=False,
         allow_null = True
     )
     class Meta:
