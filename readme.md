@@ -94,12 +94,19 @@ Add items to cart by visiting this endpoint, or sending POST request with token
 
 ## Order 
 
-Order can be made from this endpoint - from browser or by making a POST request with token using a REST API Client w
+Order can be made from this endpoint - from browser or by making a POST request with token using a REST API Client with tokens
 
 * http://127.0.0.1:8000/api/orders
 
+No need to submit the value of the `total` field because that will be automatically calculated here
 
-## Managers 
+* https://github.com/hhss16/Graded-Assessment/blob/fd80bbc180684b08414eff64ce358c96f150fde7/LittleLemonDRF/views.py#L58-L60
+
+Cart is automatically flushed after an order is placed for a user 
+
+* https://github.com/hhss16/Graded-Assessment/blob/fd80bbc180684b08414eff64ce358c96f150fde7/LittleLemonDRF/views.py#L65-L76
+
+## Managers
 
 Admin can add manager using this endpoint by sending a POST request with a valid `username` and an Admin token. Sending a DELETE request will remove this `username` from the managers group
 
