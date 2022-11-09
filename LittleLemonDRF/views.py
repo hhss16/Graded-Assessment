@@ -16,11 +16,23 @@ class CategoriesView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
+    def get_permissions(self):
+        permission_classes = []
+        if self.request.method != 'GET':
+            permission_classes = [IsAuthenticated]
+
+        
 
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
 
+    def get_permissions(self):
+        permission_classes = []
+        if self.request.method != 'GET':
+            permission_classes = [IsAuthenticated]
+
+        return [permission() for permission in permission_classes]
 
 class CartView(generics.ListCreateAPIView):
     queryset = Cart.objects.all()
@@ -30,7 +42,7 @@ class CartView(generics.ListCreateAPIView):
     def get_queryset(self):
         return Cart.objects.all().filter(user=self.request.user)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         Cart.objects.all().filter(user=self.request.user).delete()
         return Response("ok")
 
@@ -45,6 +57,8 @@ class OrderView(generics.ListCreateAPIView):
             return Order.objects.all()
         elif self.request.user.groups.count()==0: #normal customer - no group
             return Order.objects.all().filter(user=self.request.user)
+        elif self.request.user.groups.filter(name='Delivery Crew').exists(): #delivery crew
+            return Order.objects.all().filter(delivery_crew=self.request.user)  #only show oreders assigned to him
         else: #delivery crew or manager
             return Order.objects.all()
         # else:
