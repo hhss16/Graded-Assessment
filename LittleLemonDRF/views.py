@@ -28,6 +28,7 @@ class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
     search_fields = ['category__title']
+    ordering_fields = ['price', 'inventory']
 
     def get_permissions(self):
         permission_classes = []
@@ -101,7 +102,7 @@ class OrderView(generics.ListCreateAPIView):
                 )
                 orderitem.save()
 
-            Cart.objects.all().filter(user=self.request.user).delete() #delete cart items
+            # Cart.objects.all().filter(user=self.request.user).delete() #delete cart items
 
             result = order_serializer.data.copy()
             result['total'] = total
