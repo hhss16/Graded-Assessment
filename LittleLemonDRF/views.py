@@ -157,13 +157,13 @@ class DeliveryCrewViewSet(viewsets.ViewSet):
 
     def create(self, request):
         user = get_object_or_404(User, username=request.data['username'])
-        managers = Group.objects.get(name="Delivery Crew")
-        managers.user_set.add(user)
+        dc = Group.objects.get(name="Delivery Crew")
+        dc.user_set.add(user)
         return Response({"message": "user added to the delivery crew group"}, 200)
 
     def destroy(self, request):
         user = get_object_or_404(User, username=request.data['username'])
-        managers = Group.objects.get(name="Delivery Crew")
-        managers.user_set.remove(user)
+        dc = Group.objects.get(name="Delivery Crew")
+        dc.user_set.remove(user)
         return Response({"message": "user removed from the delivery crew group"}, 200)
 
