@@ -22,11 +22,12 @@ class CategoriesView(generics.ListCreateAPIView):
         if self.request.method != 'GET':
             permission_classes = [IsAuthenticated]
 
-        
+        return [permission() for permission in permission_classes]
 
 class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
+    search_fields = ['category__title']
 
     def get_permissions(self):
         permission_classes = []
