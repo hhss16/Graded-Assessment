@@ -89,8 +89,6 @@ class OrderView(generics.ListCreateAPIView):
         data['total'] = total
         data['user'] = self.request.user.id
         order_serializer = OrderSerializer(data=data)
-        order_serializer.is_valid()
-        order_serializer = OrderSerializer(data=data)
         if (order_serializer.is_valid()):
             order = order_serializer.save()
 
