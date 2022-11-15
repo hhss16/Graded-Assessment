@@ -47,11 +47,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    # user = serializers.PrimaryKeyRelatedField(
-    #     queryset=User.objects.all(),
-    #     default=serializers.CurrentUserDefault()
-    # )
-
 
     orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
 

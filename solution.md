@@ -1,3 +1,154 @@
+# Solution
+
+## Shell comands
+
+```shell
+pipenv shell
+pipenv install 
+python manage.py makemigrations 
+python manage.py migrate
+python manage.py runserver
+```
+
+## Solution for settings.py
+
+```python
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 2
+}
+```
+
+## Solution for models.py
+
+```python
+from django.db import models
+from django.contrib.auth.models import User
+
+
+class Category(models.Model):
+    slug = models.SlugField()
+    title = models.CharField(max_length=255, db_index=True)
+
+
+class MenuItem(models.Model):
+    title = models.CharField(max_length=255, db_index=True)
+    price = models.DecimalField(max_digits=6, decimal_places=2, db_index=True)
+    featured = models.BooleanField(db_index=True)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+
+
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    menuitem = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    quantity = models.SmallIntegerField()
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    class Meta:
+        unique_together = ('menuitem', 'user')
+
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    delivery_crew = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name="delivery_crew", null=True)
+    status = models.BooleanField(default=0, db_index=True)
+    total = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    date = models.DateField(db_index=True)
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name='order')
+    menuitem = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    quantity = models.SmallIntegerField()
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    class Meta:
+        unique_together = ('order', 'menuitem')
+
+```
+
+
+## Solution for serializers.py
+
+```python
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from decimal import Decimal
+
+from .models import Category, MenuItem, Cart, Order, OrderItem
+
+
+class CategorySerializer (serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'title', 'slug']
+
+
+class MenuItemSerializer(serializers.ModelSerializer):
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all()
+    )
+    # category = CategorySerializer(read_only=True)
+    class Meta:
+        model = MenuItem
+        fields = ['id', 'title', 'price', 'category', 'featured']
+
+
+class CartSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault()
+    )
+
+
+    def validate(self, attrs):
+        attrs['price'] = attrs['quantity'] * attrs['unit_price']
+        return attrs
+
+    class Meta:
+        model = Cart
+        fields = ['user', 'menuitem', 'unit_price', 'quantity', 'price']
+        extra_kwargs = {
+            'price': {'read_only': True}
+        }
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ['order', 'menuitem', 'quantity', 'price']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+
+    orderitem = OrderItemSerializer(many=True, read_only=True, source='order')
+
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'delivery_crew',
+                  'status', 'date', 'total', 'orderitem']
+
+
+class UserSerilializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','username','email']
+```
+
+## Solution for views.py
+
+```python
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Category, MenuItem, Cart, Order, OrderItem
@@ -179,3 +330,41 @@ class DeliveryCrewViewSet(viewsets.ViewSet):
         dc.user_set.remove(user)
         return Response({"message": "user removed from the delivery crew group"}, 200)
 
+
+```
+
+## Solution for application urls.py
+
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('categories', views.CategoriesView.as_view()),
+    path('menu-items', views.MenuItemsView.as_view()),
+    path('menu-items/<int:pk>', views.SingleMenuItemView.as_view()),
+    path('cart/menu-items', views.CartView.as_view()),
+    path('orders', views.OrderView.as_view()),
+    path('orders/<int:pk>', views.SingleOrderView.as_view()),
+    path('groups/manager/users', views.GroupViewSet.as_view(
+        {'get': 'list', 'post': 'create', 'delete': 'destroy'})),
+
+    path('groups/delivery-crew/users', views.DeliveryCrewViewSet.as_view(
+        {'get': 'list', 'post': 'create', 'delete': 'destroy'}))
+]
+
+```
+
+## Solution for main urls.py
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/',include('LittleLemonDRF.urls')),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.authtoken')),
+]
+```
